@@ -38,7 +38,7 @@
 
     <!-- Theme Custom CSS -->
     <link rel="stylesheet" href="{{ asset('css/custom.css') }}">
-    
+
     <link rel="icon" href="{{ asset('assets/images/logo.png') }}" type="image/svg+xml">
     <link rel="icon" href="{{ asset('assets/images/logo.png') }}" type="image/png" sizes="32x32">
     <link rel="shortcut icon" href="{{ asset('assets/images/logo.png') }}" type="image/x-icon">

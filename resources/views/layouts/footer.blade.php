@@ -4,7 +4,7 @@
                <div class="row">
                 <div class="col-lg-4 col-sm-6">
                        <div class="widget">
-                           <img src="{{ asset('assets/images/Logo.png') }}" alt="Logo" width="100" class="footer-logo"> <br>
+                           <img src="{{ asset('assets/images/logo.png') }}" alt="Logo" width="100" class="footer-logo"> <br>
                            <p>MokeUniversal - la plateforme de commerce en ligne par excellence.</p>
                        </div>
                        <!-- End .widget -->
