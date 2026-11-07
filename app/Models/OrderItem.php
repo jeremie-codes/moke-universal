@@ -4,6 +4,8 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\URL;
 
 class OrderItem extends Model
 {
@@ -54,5 +56,18 @@ class OrderItem extends Model
     public function deliveryType(): BelongsTo
     {
         return $this->belongsTo(DeliveryType::class);
+    }
+
+    public function isDownloadable(): bool
+    {
+        return $this->order?->status === 'paid'
+            && $this->deliveryType?->type === 'digital'
+            && filled($this->product?->file_path)
+            && Storage::disk('local')->exists($this->product->file_path);
+    }
+
+    public function downloadUrl(\DateTimeInterface $expiration): string
+    {
+        return URL::temporarySignedRoute('order-items.download', $expiration, ['orderItem' => $this->id]);
     }
 }

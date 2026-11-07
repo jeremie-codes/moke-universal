@@ -71,7 +71,7 @@
                 <!-- End .header-search -->
 
                 <div class="header-contact d-none d-lg-flex pl-4 pr-4">
-                    <img alt="phone" src="assets/images/phone.png" width="30" height="30" class="pb-1">
+                    <img alt="phone" src="{{ asset('assets/images/phone.png') }}" width="30" height="30" class="pb-1">
                     <h6><span>Appelez-nous maintenant</span><a href="tel:{{ $phone }}" class="text-dark font1">{{ $phone }}</a></h6>
                 </div>
 
@@ -99,6 +99,9 @@
                     @auth
                         <li class="{{ request()->routeIs('customer.orders') ? 'active' : '' }}">
                             <a href="{{ route('customer.orders') }}">Mes commandes</a>
+                        </li>
+                        <li class="{{ request()->routeIs('customer.account*') ? 'active' : '' }}">
+                            <a href="{{ route('customer.account') }}">Mon compte</a>
                         </li>
                     @endauth
                     {{-- <li><a href="">Contact</a></li> --}}

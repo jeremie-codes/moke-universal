@@ -35,11 +35,18 @@ class RouteController extends Controller
             ->take(10)
             ->get();
 
+        $sliderProduct = Product::query()
+            ->where('is_active', true)
+            ->where('is_featured', true)
+            ->with(['media', 'options', 'variants.options', 'deliveryTypes'])
+            ->latest()
+            ->first();
+
         $settings = Setting::first();
         $sponsors = Sponsor::get();
         $temoignages = Temoignage::get();
 
-        return view('index', compact('featuredProducts', 'clothingProducts', 'settings', 'sponsors', 'temoignages'));
+        return view('index', compact('featuredProducts', 'clothingProducts', 'sliderProduct', 'settings', 'sponsors', 'temoignages'));
     }
 
     /**

@@ -72,11 +72,43 @@ class CustomerAccountController extends Controller
     {
         $orders = $request->user()
             ->orders()
-            ->with('items.product')
+            ->with('items.product', 'items.deliveryType', 'items.order')
             ->latest()
             ->paginate(10);
 
         return view('cart.orders', compact('orders'));
+    }
+
+    public function account(Request $request)
+    {
+        return view('cart.account', ['user' => $request->user()]);
+    }
+
+    public function updateAccount(Request $request)
+    {
+        $user = $request->user();
+
+        $validated = $request->validate([
+            'name' => ['required', 'string', 'max:255'],
+            'email' => ['required', 'email', 'max:255', Rule::unique('users', 'email')->ignore($user->id)],
+            'phone' => ['nullable', 'string', 'max:40'],
+            'address' => ['nullable', 'string', 'max:2000'],
+            'current_password' => ['nullable', 'required_with:password', 'current_password'],
+            'password' => ['nullable', 'string', 'min:8', 'confirmed'],
+        ]);
+
+        $user->name = $validated['name'];
+        $user->email = $validated['email'];
+        $user->phone = $validated['phone'] ?? null;
+        $user->address = $validated['address'] ?? null;
+
+        if (! empty($validated['password'])) {
+            $user->password = $validated['password'];
+        }
+
+        $user->save();
+
+        return redirect()->route('customer.account')->with('status', 'Vos informations ont été mises à jour.');
     }
 
     private function claimCart(string $previousSessionId, string $currentSessionId, User $user): void

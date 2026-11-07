@@ -30,6 +30,9 @@
                     <li class="{{ request()->routeIs('customer.orders') ? 'active' : '' }}">
                         <a href="{{ route('customer.orders') }}">Mes commandes</a>
                     </li>
+                    <li class="{{ request()->routeIs('customer.account*') ? 'active' : '' }}">
+                        <a href="{{ route('customer.account') }}">Mon compte</a>
+                    </li>
                 @endauth
             </ul>
         </nav>

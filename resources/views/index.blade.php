@@ -5,6 +5,77 @@
 @section('body')
 
 <main class="main">
+    @php
+        $sliderImage = $sliderProduct?->getMedia('images')->first()?->getUrl()
+            ?? ($sliderProduct?->cover_image
+                ? \Illuminate\Support\Facades\Storage::disk('public')->url($sliderProduct->cover_image)
+                : asset('assets/images/auteur.jpeg'));
+    @endphp
+    <style>
+        .home-slider .home-slide1 > .slide-bg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            z-index: 0;
+        }
+        .home-slider .home-slide1 > .container {
+            position: relative !important;
+            top: auto;
+            left: auto;
+            right: auto;
+            bottom: auto;
+            z-index: 1;
+            min-height: 499px;
+            padding-top: 2.5rem;
+            padding-bottom: 2.5rem;
+        }
+        .home-slider .home-slide1 .banner-layer {
+            position: relative !important;
+            top: 0 !important;
+            left: 0 !important;
+            right: auto;
+            bottom: auto;
+        }
+        .home-slider .home-slide1 .slider-product-image {
+            flex: 0 0 auto;
+            width: 36%;
+            max-width: 340px;
+            height: auto;
+            margin-left: 1.5rem;
+        }
+        .home-slider .home-slide1 .slider-product-image img {
+            display: block;
+            width: 100%;
+            height: auto !important;
+            min-height: 0 !important;
+            max-height: 360px !important;
+            object-fit: contain;
+            border-radius: 0.5rem;
+        }
+        @media (max-width: 767.98px) {
+            .home-slider .home-slide1 > .container {
+                flex-direction: column;
+                align-items: flex-start;
+                min-height: 0;
+                padding-top: 2rem;
+                padding-bottom: 2rem;
+            }
+            .home-slider .home-slide1 .slider-product-image {
+                width: 70%;
+                max-width: 240px;
+                margin: 1.5rem auto 0;
+                align-self: center;
+            }
+            .home-slider .home-slide1 .slider-product-image img {
+                max-height: 240px !important;
+            }
+        }
+    </style>
+
+    <!-- Start .home-slider -->
     <div class="home-slider slide-animate owl-carousel owl-theme show-nav-hover nav-big mb-2 text-uppercase"
         data-owl-options="{'loop': false }">
         <div class="home-slide home-slide1 banner">
@@ -12,43 +83,44 @@
                 height="499" alt="slider image">
             <div class="container d-flex align-items-center justify-content-between">
                 <div class="banner-layer appear-animate" data-animation-name="fadeInUpShorter">
-                    <h4 class="text-transform-none m-b-3">Nouveaux Livres, bientôt disponible!</h4>
-                    <h2 class="text-transform-none mb-0">Comming soon...</h2>
+                    <h4 class="text-transform-none m-b-3">Nouvel article,</h4>
+                    <h2 class="text-transform-none mb-0">disponible!</h2>
                     {{-- <h3 class="m-b-3">70% Off</h3> --}}
-                    <h3 class="m-b-3">FALTA</h3>
+                    @if ($sliderProduct)
+                    <h3 class="m-b-3">{{ $sliderProduct->title }}</h3>
                     <h5 class="d-inline-block mb-0">
                         <span>à Seulement</span>
                         <b class="coupon-sale-text text-white bg-secondary align-middle">
                             <sup>$</sup>
-                            <em class="align-text-top">39</em>
-                            <sup>,99</sup>
+                            <em class="align-text-top">{{ $sliderProduct->price }}</em>
                         </b>
                     </h5>
-                    <a href="{{ route('shop.index') }}" class="btn btn-dark btn-lg">Réserver!</a>
+                        @php
+                            $sliderStock = $sliderProduct->availableStock();
+                            $needsOptions = $sliderProduct->options->isNotEmpty()
+                                || $sliderProduct->variants->isNotEmpty()
+                                || $sliderProduct->deliveryTypes->isNotEmpty();
+                        @endphp
+                        @if ($needsOptions)
+                            <a href="{{ route('shop.show', $sliderProduct->slug) }}" class="btn btn-dark btn-lg">Ajouter au panier</a>
+                        @else
+                            <button type="button" class="btn btn-dark btn-lg js-add-to-cart"
+                                data-url="{{ route('cart.items.store') }}" data-product-id="{{ $sliderProduct->id }}"
+                                data-product-name="{{ $sliderProduct->title }}" data-product-image="{{ $sliderImage }}"
+                                data-product-url="{{ route('shop.show', $sliderProduct->slug) }}"
+                                data-product-base-stock="{{ $sliderStock }}" @disabled($sliderStock < 1)>
+                                <span>{{ $sliderStock > 0 ? 'Ajouter au panier' : 'Épuisé' }}</span>
+                            </button>
+                        @endif
+                    @else
+                        <a href="{{ route('shop.index') }}" class="btn btn-dark btn-lg">Voir la boutique</a>
+                    @endif
                 </div>
 
-                {{-- <div class="col-4" style="border-radius: 15px; width: 40%; align-self: flex-end !important;">
-                    <img src="{{ asset('assets/images/auteur.jpeg') }}" alt="banner image">
-                </div> --}}
-                <!-- End .banner-layer -->
-            </div>
-        </div>
-        <!-- End .home-slide -->
-
-        <div class="home-slide home-slide2 banner banner-md-vw">
-            <img class="slide-bg" style="background-color: #ccc;" width="1903" height="499"
-                src="{{ asset('assets/images/demoes/demo4/slider/slide-2.jpg') }}" alt="slider image">
-            <div class="container d-flex align-items-center">
-                <div class="banner-layer d-flex justify-content-center appear-animate"
-                    data-animation-name="fadeInUpShorter">
-                    <div class="mx-auto">
-                        <h4 class="m-b-1">Vente des</h4>
-                        <h3 class="m-b-2">Vêtements &</h3>
-                        <h3 class="mb-2 heading-border">Accessories</h3>
-                        <h2 class="text-transform-none m-b-4">Livres</h2>
-                        <a href="{{ route('shop.index') }}" class="btn btn-block btn-dark">Voir la boutique</a>
-                    </div>
+                <div class="slider-product-image">
+                    <img src="{{ $sliderImage }}" alt="{{ $sliderProduct?->title ?? 'Image de la bannière' }}">
                 </div>
+
                 <!-- End .banner-layer -->
             </div>
         </div>

@@ -5,6 +5,7 @@ namespace App\Filament\Resources\Products\Schemas;
 use App\Models\Category;
 use Filament\Forms\Components\CheckboxList;
 use Filament\Forms\Components\DatePicker;
+use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
@@ -60,6 +61,18 @@ class ProductForm
                             ->reorderable()
                             ->image()
                             ->maxSize(5120),
+                    ]),
+
+                Section::make('Fichier numérique')
+                    ->description('Fichier PDF livré au client après paiement, lorsqu’il choisit la réception électronique.')
+                    ->schema([
+                        FileUpload::make('file_path')
+                            ->label('Fichier PDF')
+                            ->disk('local')
+                            ->directory('product-files')
+                            ->visibility('private')
+                            ->acceptedFileTypes(['application/pdf'])
+                            ->maxSize(51200),
                     ]),
 
                 Section::make('Tarification')

@@ -4,6 +4,7 @@ use App\Http\Controllers\CartController;
 use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\CustomerAccountController;
 use App\Http\Controllers\NewsletterController;
+use App\Http\Controllers\OrderItemDownloadController;
 use App\Http\Controllers\ShopController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\RouteController;
@@ -23,6 +24,8 @@ Route::post('/checkout/login', [CustomerAccountController::class, 'login'])->mid
 Route::post('/checkout/register', [CustomerAccountController::class, 'register'])->name('customer.register');
 Route::post('/logout', [CustomerAccountController::class, 'logout'])->middleware('auth')->name('customer.logout');
 Route::get('/account/orders', [CustomerAccountController::class, 'orders'])->middleware('auth')->name('customer.orders');
+Route::get('/account', [CustomerAccountController::class, 'account'])->middleware('auth')->name('customer.account');
+Route::put('/account', [CustomerAccountController::class, 'updateAccount'])->middleware('auth')->name('customer.account.update');
 Route::get('/checkout/confirmation/{reference}', [CheckoutController::class, 'success'])->name('checkout.success');
 Route::get('/checkout/payment/{reference}', [CheckoutController::class, 'paymentStatusPage'])->name('checkout.payment.status');
 Route::get('/checkout/payment/{reference}/check', [CheckoutController::class, 'checkPaymentStatus'])->name('checkout.payment.check');
@@ -30,6 +33,7 @@ Route::post('/checkout/payment/callback/{reference}', [CheckoutController::class
 Route::get('/checkout/payment/success/{reference}', [CheckoutController::class, 'paymentSuccess'])->name('checkout.payment.success');
 Route::get('/checkout/payment/cancel/{reference}', [CheckoutController::class, 'paymentCancel'])->name('checkout.payment.cancel');
 Route::get('/checkout/payment/decline/{reference}', [CheckoutController::class, 'paymentDecline'])->name('checkout.payment.decline');
+Route::get('/downloads/order-items/{orderItem}', OrderItemDownloadController::class)->middleware('signed')->name('order-items.download');
 
 Route::get('/portfolio', [PortfolioController::class, 'index'])->name('portfolio.index');
 Route::get('/portfolio/{project:slug}', [PortfolioController::class, 'show'])->name('portfolio.show');

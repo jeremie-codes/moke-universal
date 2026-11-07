@@ -28,6 +28,7 @@ class Product extends Model implements HasMedia
         'stock',
         'sku',
         'cover_image',
+        'file_path',
         'is_featured',
         'is_active',
         'published_at',

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Cart;
 use App\Models\Order;
+use App\Models\OrderItem;
 use App\Models\Payment;
 use App\Services\FlexpaieService;
 use Illuminate\Http\Request;
@@ -303,7 +304,22 @@ class CheckoutController extends Controller
                 'failed' => 'Le paiement a été refusé ou a échoué.',
                 default => 'En attente de confirmation du paiement.',
             },
+            'downloads' => $status === 'success' ? $this->downloadLinks($payment->order) : [],
         ];
+    }
+
+    private function downloadLinks(Order $order): array
+    {
+        return $order->items()
+            ->with(['product', 'deliveryType', 'order'])
+            ->get()
+            ->filter(fn (OrderItem $item) => $item->isDownloadable())
+            ->map(fn (OrderItem $item) => [
+                'label' => $item->product->title,
+                'url' => $item->downloadUrl(now()->addDays(7)),
+            ])
+            ->values()
+            ->all();
     }
 
     private function currentCart(Request $request): ?Cart

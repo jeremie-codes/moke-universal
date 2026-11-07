@@ -129,6 +129,19 @@
                         data-checkout-details>
                         @csrf
                         <input type="hidden" name="customer_mode" value="{{ $customerMode }}">
+                        @auth
+                            <div class="checkout-delivery-summary card card-body bg-light mb-4 d-flex flex-row justify-content-between align-items-start">
+                                <div>
+                                    <strong>{{ auth()->user()->name }}</strong><br>
+                                    <span>{{ auth()->user()->email }}</span><br>
+                                    <span>{{ auth()->user()->phone ?: 'Téléphone non renseigné' }}</span><br>
+                                    <span style="white-space: pre-line">{{ auth()->user()->address ?: 'Adresse non renseignée' }}</span>
+                                </div>
+                                <button type="button" class="btn btn-sm btn-outline-dark ml-3 flex-shrink-0"
+                                    data-delivery-toggle aria-expanded="false" aria-controls="delivery-fields">Modifier</button>
+                            </div>
+                        @endauth
+                        <div id="delivery-fields" class="{{ auth()->check() ? 'd-none' : '' }}" data-delivery-fields>
                         <div class="form-group">
                             <label for="fullname">Nom complet <abbr class="required" title="obligatoire">*</abbr></label>
                             <input id="fullname" name="fullname" type="text" class="form-control"
@@ -144,13 +157,14 @@
                         <div class="form-group">
                             <label for="phone">Téléphone <abbr class="required" title="obligatoire">*</abbr></label>
                             <input id="phone" name="phone" type="tel" class="form-control"
-                                value="{{ old('phone') }}" autocomplete="tel" required maxlength="40">
+                                value="{{ old('phone', auth()->user()?->phone) }}" autocomplete="tel" required maxlength="40">
                         </div>
 
                         <div class="form-group">
                             <label for="address">Adresse complète <abbr class="required" title="obligatoire">*</abbr></label>
                             <textarea id="address" name="address" class="form-control" rows="4"
-                                autocomplete="street-address" required maxlength="2000">{{ old('address') }}</textarea>
+                                autocomplete="street-address" required maxlength="2000">{{ old('address', auth()->user()?->address) }}</textarea>
+                        </div>
                         </div>
 
                         <fieldset class="form-group">
@@ -179,7 +193,7 @@
                             @enderror
                         </div>
 
-                        <p class="text-muted">Les paiements sont traités de manière sécurisée par FlexPay.</p>
+                        <p class="alert alert-info">Les paiements sont traités de manière sécurisée par FlexPaie.</p>
                         <button type="submit" class="btn btn-dark btn-place-order">Procéder au paiement</button>
                     </form>
                 </section>
@@ -271,6 +285,28 @@
 
         customerModes.forEach((mode) => mode.addEventListener('change', updateCustomerMode));
         updateCustomerMode();
+
+        const deliveryFields = document.querySelector('[data-delivery-fields]');
+        const deliveryToggle = document.querySelector('[data-delivery-toggle]');
+        const placeOrderButton = document.querySelector('.btn-place-order');
+
+        const setDeliveryOpen = (open) => {
+            if (!deliveryFields || !deliveryToggle) return;
+            deliveryFields.classList.toggle('d-none', !open);
+            deliveryToggle.setAttribute('aria-expanded', String(open));
+            deliveryToggle.textContent = open ? 'Masquer' : 'Modifier';
+        };
+
+        deliveryToggle?.addEventListener('click', () => {
+            setDeliveryOpen(deliveryFields.classList.contains('d-none'));
+        });
+
+        // Les champs cachés bloqueraient la validation du formulaire : on les déplie si un champ requis est vide.
+        placeOrderButton?.addEventListener('click', () => {
+            if (!deliveryFields || !deliveryFields.classList.contains('d-none')) return;
+            const hasInvalidField = [...deliveryFields.querySelectorAll('input, textarea')].some((field) => !field.checkValidity());
+            if (hasInvalidField) setDeliveryOpen(true);
+        });
     })();
 </script>
 @endsection

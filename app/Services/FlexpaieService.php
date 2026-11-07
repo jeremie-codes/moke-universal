@@ -24,12 +24,13 @@ class FlexpaieService
             'Content-Type' => 'application/json',
         ])->post(self::BASE_URL_MOBILE, [
             'merchant' => config('services.flexpay.merchant'),
-            'type' => '1',
             'reference' => $reference,
-            'phone' => $phone,
             'amount' => $amount,
             'currency' => $currency,
-            'callbackUrl' => $callbackUrl,
+            'type' => '1',
+            'phone' => $phone,
+            "description" => "Paiement d'article sur Moke Universal platform",
+            'callbackUrl' => $callbackUrl
         ]);
 
         logger()->info('FlexPay mobile', [
@@ -55,11 +56,11 @@ class FlexpaieService
             'reference' => $reference,
             'amount' => $amount,
             'currency' => $currency,
-            'description' => 'Paiement d’une commande Moke',
+            'description' => "Paiement d'article sur Moke Universal platform",
             'callback_url' => $callbackUrl,
             'approve_url' => $approveUrl,
             'cancel_url' => $cancelUrl,
-            'decline_url' => $declineUrl,
+            'decline_url' => $declineUrl
         ]);
 
         logger()->info('FlexPay card', [
