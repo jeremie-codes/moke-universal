@@ -64,7 +64,6 @@ class PaymentForm
                             ->label('Devise')
                             ->options([
                                 'USD' => 'USD',
-                                'CDF' => 'CDF',
                                 ])
                             ->default('USD')
                             ->required()

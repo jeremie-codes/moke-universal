@@ -115,7 +115,7 @@ class CheckoutController extends Controller
                 'method' => $validated['payment_method'],
                 'phone' => $validated['payment_phone'] ?? null,
                 'amount' => $order->total,
-                'currency' => 'CDF',
+                'currency' => 'USD',
                 'status' => 'pending',
             ]);
 
@@ -128,13 +128,13 @@ class CheckoutController extends Controller
                     $payment->reference,
                     $order->total,
                     $validated['payment_phone'],
-                    'CDF',
+                    'USD',
                     route('checkout.payment.callback', ['reference' => $payment->reference]),
                 )
                 : $flexpay->cardPayment(
                     $payment->reference,
                     $order->total,
-                    'CDF',
+                    'USD',
                     route('checkout.payment.callback', ['reference' => $payment->reference]),
                     route('checkout.payment.success', ['reference' => $payment->reference]),
                     route('checkout.payment.cancel', ['reference' => $payment->reference]),
