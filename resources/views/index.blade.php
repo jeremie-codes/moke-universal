@@ -79,7 +79,7 @@
     <div class="home-slider slide-animate owl-carousel owl-theme show-nav-hover nav-big mb-2 text-uppercase"
         data-owl-options="{'loop': false }">
         <div class="home-slide home-slide1 banner">
-            <img class="slide-bg" src="{{ asset('assets/images/demoes/demo4/slider/slide-1.jpg') }}" width="1903"
+            <img class="slide-bg" src="{{ asset('assets/images/demoes/demo4/slider/slide-1-0.jpg') }}" width="1903"
                 height="499" alt="slider image">
             <div class="container d-flex align-items-center justify-content-between">
                 <div class="banner-layer appear-animate" data-animation-name="fadeInUpShorter">
