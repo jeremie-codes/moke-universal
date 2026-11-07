@@ -59,6 +59,18 @@ class ItemsRelationManager extends RelationManager
                     ->label('Produit')
                     ->searchable(),
 
+                TextColumn::make('variant_name')
+                    ->label('Variante'),
+
+                TextColumn::make('product_option_name')
+                    ->label('Option produit'),
+
+                TextColumn::make('variant_option_name')
+                    ->label('Option variante'),
+
+                TextColumn::make('delivery_type_label')
+                    ->label('Mode de réception'),
+
                 TextColumn::make('quantity')
                     ->label('Quantité'),
 

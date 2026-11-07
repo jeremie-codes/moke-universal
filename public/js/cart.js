@@ -15,6 +15,44 @@
         });
     }
 
+    function updateProductSelections(form) {
+        const details = form.closest('.product-single-details');
+        const selectedVariant = form.querySelector('[name="variant_id"]:checked');
+        const variantOptionGroup = form.querySelector('[data-variant-option-group]');
+        const variantId = selectedVariant?.value;
+
+        form.querySelectorAll('[name="variant_option_id"]').forEach((radio) => {
+            const belongsToVariant = radio.dataset.variantId === variantId;
+            const isAvailable = Number.parseInt(radio.dataset.stock, 10) > 0;
+            const label = radio.closest('.product-choice');
+
+            if (radio.checked && !belongsToVariant) radio.checked = false;
+            radio.disabled = !belongsToVariant || !isAvailable;
+            radio.required = belongsToVariant;
+            label.hidden = !belongsToVariant;
+            label.classList.toggle('is-disabled', belongsToVariant && !isAvailable);
+        });
+
+        if (variantOptionGroup) variantOptionGroup.hidden = !variantId;
+
+        form.querySelectorAll('.product-choice input[type="radio"]').forEach((radio) => {
+            radio.closest('.product-choice').classList.toggle('is-selected', radio.checked);
+            radio.closest('.product-choice').classList.toggle('is-disabled', radio.disabled);
+        });
+
+        const baseStock = Number.parseInt(details.querySelector('.js-add-to-cart').dataset.productBaseStock, 10);
+        const chosenOptions = [
+            form.querySelector('[name="product_option_id"]:checked'),
+            form.querySelector('[name="variant_option_id"]:checked'),
+        ]
+            .filter(Boolean)
+            .map((radio) => Number.parseInt(radio.dataset.stock, 10));
+        const stock = chosenOptions.length ? Math.min(...chosenOptions) : baseStock;
+        const quantity = details.querySelector('.js-product-quantity');
+        quantity.max = stock;
+        if (Number.parseInt(quantity.value, 10) > stock) quantity.value = Math.max(1, stock);
+    }
+
     function recalculateCart() {
         let subtotal = 0;
         const rows = document.querySelectorAll('.cart-line');
@@ -56,15 +94,25 @@
     document.addEventListener('click', async (event) => {
         const addButton = event.target.closest('.js-add-to-cart');
         if (addButton) {
+            const details = addButton.closest('.product-single-details');
+            const optionsForm = details?.querySelector('[data-product-options]');
+            if (optionsForm && !optionsForm.reportValidity()) return;
+
             addButton.disabled = true;
             try {
-                const data = await sendRequest(addButton.dataset.url, 'POST', {
+                const payload = {
                     product_id: Number(addButton.dataset.productId),
                     quantity: Number.parseInt(
-                        addButton.closest('.product-single-details')?.querySelector('.js-product-quantity')?.value,
+                        details?.querySelector('.js-product-quantity')?.value,
                         10,
                     ) || 1,
+                };
+                ['variant_id', 'product_option_id', 'variant_option_id', 'delivery_type_id'].forEach((field) => {
+                    const value = optionsForm?.querySelector(`[name="${field}"]:checked, select[name="${field}"]`)?.value;
+                    if (value) payload[field] = Number(value);
                 });
+
+                const data = await sendRequest(addButton.dataset.url, 'POST', payload);
                 updateBadges(data.cart_count);
                 window.showCartMiniPopup?.({
                     name: addButton.dataset.productName,
@@ -117,6 +165,25 @@
 
     document.addEventListener('change', async (event) => {
         const input = event.target;
+        if (input.matches('[data-product-options] select, [data-product-options] input[type="radio"]')) {
+            updateProductSelections(input.form);
+            return;
+        }
+
+        if (input.matches('.cart-delivery-type')) {
+            const previousValue = input.dataset.savedDeliveryType;
+            try {
+                await sendRequest(input.dataset.url, 'PATCH', {
+                    delivery_type_id: input.value ? Number(input.value) : null,
+                });
+                input.dataset.savedDeliveryType = input.value;
+            } catch (error) {
+                input.value = previousValue;
+                window.alert(error.message);
+            }
+            return;
+        }
+
         if (!input.matches('.cart-quantity')) return;
 
         const quantity = Math.max(1, Math.min(
@@ -139,4 +206,6 @@
             window.alert(error.message);
         }
     });
+
+    document.querySelectorAll('[data-product-options]').forEach(updateProductSelections);
 })();

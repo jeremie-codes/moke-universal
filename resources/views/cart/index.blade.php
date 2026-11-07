@@ -40,11 +40,12 @@
                                                 ? \Illuminate\Support\Facades\Storage::disk('public')->url($item->product->cover_image)
                                                 : asset('assets/images/products/product-1.jpg'));
                                         $lineSubtotal = (float) $item->price * $item->quantity;
+                                        $allowedDeliveryTypes = $item->product->deliveryTypes;
                                     @endphp
                                     <tr class="product-row cart-line" data-unit-price="{{ $item->price }}">
                                         <td>
                                             <figure class="product-image-container">
-                                                <a href="product.html" class="product-image">
+                                                <a href="{{ route('shop.show', $item->product->slug) }}" class="product-image">
                                                     <img src="{{ $image }}" alt="{{ $item->product->title }}" width="80">
                                                 </a>
 
@@ -55,12 +56,44 @@
                                         </td>
                                         <td class="product-col">
                                             <h5 class="product-title">{{ $item->product->title }}</h5>
+                                            @php
+                                                $selectedOptions = collect([
+                                                    $item->variant?->name,
+                                                    $item->productOption?->name,
+                                                    $item->variantOption?->name,
+                                                ])->filter();
+                                            @endphp
+                                            @if ($selectedOptions->isNotEmpty())
+                                                <small class="text-muted">{{ $selectedOptions->implode(' / ') }}</small>
+                                            @endif
+                                            @if ($allowedDeliveryTypes->isNotEmpty())
+                                                <div class="form-group mt-2 mb-0 p-0">
+                                                    <label for="delivery-type-{{ $item->id }}">Mode de réception</label>
+                                                    <select id="delivery-type-{{ $item->id }}"
+                                                        class="form-control cart-delivery-type"
+                                                        data-url="{{ route('cart.items.update', $item->id) }}"
+                                                        data-saved-delivery-type="{{ $item->delivery_type_id ?? '' }}"
+                                                        required>
+                                                        <option value="">Choisir un mode de réception</option>
+                                                        @foreach ($allowedDeliveryTypes as $deliveryType)
+                                                            <option value="{{ $deliveryType->id }}"
+                                                                @selected($item->delivery_type_id === $deliveryType->id)>
+                                                                {{ $deliveryType->label }}
+                                                            </option>
+                                                        @endforeach
+                                                    </select>
+                                                </div>
+                                            @elseif ($item->deliveryType)
+                                                <small class="d-block text-warning">
+                                                    Mode de réception non disponible : {{ $item->deliveryType->label }}
+                                                </small>
+                                            @endif
                                         </td>
                                         <td>{{ number_format((float) $item->price, 2, ',', ' ') }} $</td>
                                         <td>
                                             <input class="form-control cart-quantity" type="number" min="1"
-                                                max="{{ $item->product->stock }}" value="{{ $item->quantity }}"
-                                                data-stock="{{ $item->product->stock }}"
+                                                max="{{ $item->availableStock() }}" value="{{ $item->quantity }}"
+                                                data-stock="{{ $item->availableStock() }}"
                                                 data-saved-quantity="{{ $item->quantity }}"
                                                 data-url="{{ route('cart.items.update', $item->id) }}"
                                                 aria-label="Quantité de {{ $item->product->title }}">

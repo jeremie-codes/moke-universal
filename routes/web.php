@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\CheckoutController;
+use App\Http\Controllers\CustomerAccountController;
 use App\Http\Controllers\NewsletterController;
 use App\Http\Controllers\ShopController;
 use Illuminate\Support\Facades\Route;
@@ -18,6 +19,10 @@ Route::patch('/cart/items/{item}', [CartController::class, 'update'])->name('car
 Route::delete('/cart/items/{item}', [CartController::class, 'destroy'])->name('cart.items.destroy');
 Route::get('/checkout', [CheckoutController::class, 'index'])->name('checkout.index');
 Route::post('/checkout', [CheckoutController::class, 'store'])->name('checkout.store');
+Route::post('/checkout/login', [CustomerAccountController::class, 'login'])->middleware('throttle:5,1')->name('customer.login');
+Route::post('/checkout/register', [CustomerAccountController::class, 'register'])->name('customer.register');
+Route::post('/logout', [CustomerAccountController::class, 'logout'])->middleware('auth')->name('customer.logout');
+Route::get('/account/orders', [CustomerAccountController::class, 'orders'])->middleware('auth')->name('customer.orders');
 Route::get('/checkout/confirmation/{reference}', [CheckoutController::class, 'success'])->name('checkout.success');
 Route::get('/checkout/payment/{reference}', [CheckoutController::class, 'paymentStatusPage'])->name('checkout.payment.status');
 Route::get('/checkout/payment/{reference}/check', [CheckoutController::class, 'checkPaymentStatus'])->name('checkout.payment.check');

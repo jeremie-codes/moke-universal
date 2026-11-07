@@ -96,6 +96,11 @@
                     <li class="{{ request()->routeIs('home') ? 'active' : '' }}"><a  href="{{ route('home') }}">Accueil</a></li>
                     <li class="{{ request()->routeIs('shop.index') ? 'active' : '' }}"><a href="{{ route('shop.index') }}">Boutique</a></li>
                     <li class="{{ request()->routeIs('portfolio.index') ? 'active' : '' }}"><a href="{{ route('portfolio.index') }}">Portfolio</a></li>
+                    @auth
+                        <li class="{{ request()->routeIs('customer.orders') ? 'active' : '' }}">
+                            <a href="{{ route('customer.orders') }}">Mes commandes</a>
+                        </li>
+                    @endauth
                     {{-- <li><a href="">Contact</a></li> --}}
                     <li class="float-right">
                     {{-- <a href="#" rel="noopener" class="badge badge-dark px-3 text-white">News !</a> --}}

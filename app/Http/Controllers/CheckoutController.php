@@ -17,7 +17,9 @@ class CheckoutController extends Controller
     public function index(Request $request)
     {
         $cart = $this->currentCart($request);
-        $cartItems = $cart?->items()->with('product')->get() ?? collect();
+        $cartItems = $cart?->items()
+            ->with(['product.deliveryTypes', 'variant', 'productOption', 'variantOption', 'deliveryType'])
+            ->get() ?? collect();
 
         if ($cartItems->isEmpty()) {
             return redirect()->route('cart.index')->with('error', 'Votre panier est vide.');
@@ -41,8 +43,19 @@ class CheckoutController extends Controller
 
         [$order, $payment] = DB::transaction(function () use ($request, $validated) {
             $cart = Cart::query()
-                ->where('session_id', $request->session()->getId())
-                ->with('items.product')
+                ->where(function ($query) use ($request) {
+                    $query->where('session_id', $request->session()->getId());
+                    if ($request->user()) {
+                        $query->orWhere('user_id', $request->user()->id);
+                    }
+                })
+                ->with([
+                    'items.product.deliveryTypes',
+                    'items.variant',
+                    'items.productOption',
+                    'items.variantOption',
+                    'items.deliveryType',
+                ])
                 ->lockForUpdate()
                 ->first();
 
@@ -53,9 +66,20 @@ class CheckoutController extends Controller
             }
 
             foreach ($cart->items as $item) {
-                if (!$item->product || !$item->product->is_active || $item->quantity > $item->product->stock) {
+                if (!$item->product || !$item->product->is_active || $item->quantity > $item->availableStock()) {
                     throw ValidationException::withMessages([
                         'cart' => 'Un produit de votre panier n’est plus disponible dans la quantité demandée.',
+                    ]);
+                }
+
+                $allowedDeliveryTypes = $item->product->deliveryTypes;
+                $deliveryTypeIsValid = $allowedDeliveryTypes->isEmpty()
+                    ? $item->delivery_type_id === null
+                    : $allowedDeliveryTypes->contains('id', $item->delivery_type_id);
+
+                if (!$deliveryTypeIsValid) {
+                    throw ValidationException::withMessages([
+                        'cart' => 'Choisissez un mode de réception autorisé pour chaque produit de votre panier.',
                     ]);
                 }
             }
@@ -72,6 +96,14 @@ class CheckoutController extends Controller
             foreach ($cart->items as $item) {
                 $order->items()->create([
                     'product_id' => $item->product_id,
+                    'variant_id' => $item->variant_id,
+                    'product_option_id' => $item->product_option_id,
+                    'variant_option_id' => $item->variant_option_id,
+                    'variant_name' => $item->variant?->name,
+                    'product_option_name' => $item->productOption?->name,
+                    'variant_option_name' => $item->variantOption?->name,
+                    'delivery_type_id' => $item->delivery_type_id,
+                    'delivery_type_label' => $item->deliveryType?->label,
                     'price' => $item->price,
                     'quantity' => $item->quantity,
                 ]);
@@ -277,7 +309,12 @@ class CheckoutController extends Controller
     private function currentCart(Request $request): ?Cart
     {
         return Cart::query()
-            ->where('session_id', $request->session()->getId())
+            ->where(function ($query) use ($request) {
+                $query->where('session_id', $request->session()->getId());
+                if ($request->user()) {
+                    $query->orWhere('user_id', $request->user()->id);
+                }
+            })
             ->first();
     }
 }

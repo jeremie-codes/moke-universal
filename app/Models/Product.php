@@ -4,6 +4,8 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
 use Illuminate\Support\Str;
@@ -82,6 +84,43 @@ class Product extends Model implements HasMedia
     public function category(): BelongsTo
     {
         return $this->belongsTo(Category::class);
+    }
+
+    public function variants(): HasMany
+    {
+        return $this->hasMany(Variant::class);
+    }
+
+    public function options(): HasMany
+    {
+        return $this->hasMany(Option::class);
+    }
+
+    public function deliveryTypes(): BelongsToMany
+    {
+        return $this->belongsToMany(DeliveryType::class, 'product_delivery_types')
+            ->withTimestamps();
+    }
+
+    public function availableStock(): int
+    {
+        $variantOptions = $this->variants
+            ->flatMap(fn (Variant $variant) => $variant->options);
+        $productOptions = $this->options;
+
+        if ($variantOptions->isNotEmpty() && $productOptions->isNotEmpty()) {
+            return min((int) $variantOptions->sum('stock'), (int) $productOptions->sum('stock'));
+        }
+
+        if ($variantOptions->isNotEmpty()) {
+            return (int) $variantOptions->sum('stock');
+        }
+
+        if ($productOptions->isNotEmpty()) {
+            return (int) $productOptions->sum('stock');
+        }
+
+        return (int) $this->stock;
     }
 
 }

@@ -16,7 +16,7 @@ class RouteController extends Controller
     {
         $activeProducts = Product::query()
             ->where('is_active', true)
-            ->with(['category', 'media'])
+            ->with(['category', 'media', 'options', 'variants.options', 'deliveryTypes'])
             ->latest();
 
         $featuredProducts = (clone $activeProducts)

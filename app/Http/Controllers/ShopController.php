@@ -10,7 +10,7 @@ class ShopController extends Controller
     {
         $products = Product::query()
             ->where('is_active', true)
-            ->with(['category', 'media'])
+            ->with(['category', 'media', 'options', 'variants.options', 'deliveryTypes'])
             ->latest()
             ->paginate(12);
 
@@ -20,7 +20,7 @@ class ShopController extends Controller
     public function show(Product $product)
     {
         abort_unless($product->is_active, 404);
-        $product->load(['category', 'media']);
+        $product->load(['category', 'media', 'options', 'variants.options', 'deliveryTypes']);
 
         return view('shop.show', compact('product'));
     }

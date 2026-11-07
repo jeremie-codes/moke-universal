@@ -3,6 +3,9 @@
 @section('title', 'Finaliser ma commande')
 
 @section('body')
+@php
+    $customerMode = auth()->check() ? 'account' : old('customer_mode', 'guest');
+@endphp
 <main class="main">
     <div class="container checkout-container py-4">
         <ul class="checkout-progress-bar d-flex justify-content-center flex-wrap">
@@ -12,7 +15,7 @@
         </ul>
 
         <h1 class="h2 mb-4">Finaliser ma commande</h1>
-        <h2 class="step-title">Coordonnées de livraison</h2>
+        <h2 class="step-title">Votre compte client</h2>
 
         @if ($errors->any())
             <div class="alert alert-danger" role="alert">
@@ -24,21 +27,118 @@
             </div>
         @endif
 
+        @if (session('status'))
+            <div class="alert alert-success" role="status">{{ session('status') }}</div>
+
+            <script>
+                setTimeout(() => {
+                    document.querySelector('.alert.alert-success').remove();
+                }, 5000); // Remove the success alert after 5 seconds
+            </script>
+        @endif
+
         <div class="row">
             <div class="col-lg-7">
                 <section class="checkout-steps">
-                    <form action="{{ route('checkout.store') }}" method="POST" id="checkout-form">
+                    @auth
+                        <div class="alert alert-info">
+                           <div>
+                                Vous êtes connecté en tant que <strong>{{ auth()->user()->email }}</strong>. <br>
+                                Votre compte vous permet de suivre vos commandes et les articles achetés.
+                                <a href="{{ route('customer.orders') }}" class="d-block mt-2">Suivre mes commandes</a>
+                            </div>
+                        </div>
+                        <form action="{{ route('customer.logout') }}" method="POST" class="mb-4">
+                            @csrf
+                            <button type="submit" class="btn btn-link px-0">Se déconnecter</button>
+                        </form>
+                    @else
+                        <fieldset class="form-group mb-4">
+                            <legend class="h5">Comment souhaitez-vous poursuivre ?</legend>
+                            <div class="custom-control custom-radio mb-2">
+                                <input class="custom-control-input" id="customer-guest" name="customer_mode" type="radio"
+                                    value="guest" @checked($customerMode === 'guest')>
+                                <label class="custom-control-label" for="customer-guest">
+                                    Commander sans compte
+                                </label>
+                            </div>
+                            <div class="custom-control custom-radio mb-2">
+                                <input class="custom-control-input" id="customer-login" name="customer_mode" type="radio"
+                                    value="login" @checked($customerMode === 'login')>
+                                <label class="custom-control-label" for="customer-login">
+                                    Me connecter pour suivre mes commandes et mes articles achetés
+                                </label>
+                            </div>
+                            <div class="custom-control custom-radio">
+                                <input class="custom-control-input" id="customer-register" name="customer_mode" type="radio"
+                                    value="register" @checked($customerMode === 'register')>
+                                <label class="custom-control-label" for="customer-register">
+                                    Créer un compte client
+                                </label>
+                            </div>
+                        </fieldset>
+
+                        <form action="{{ route('customer.login') }}" method="POST"
+                            class="mb-4 {{ $customerMode === 'login' ? '' : 'd-none' }}" data-customer-panel="login">
+                            @csrf
+                            <input type="hidden" name="customer_mode" value="login">
+                            <div class="form-group">
+                                <label for="login-email">Adresse e-mail</label>
+                                <input id="login-email" name="email" type="email" class="form-control"
+                                    value="{{ old('email') }}" autocomplete="email" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="login-password">Mot de passe</label>
+                                <input id="login-password" name="password" type="password" class="form-control"
+                                    autocomplete="current-password" required>
+                            </div>
+                            <button type="submit" class="btn btn-dark">Se connecter</button>
+                        </form>
+
+                        <form action="{{ route('customer.register') }}" method="POST"
+                            class="mb-4 {{ $customerMode === 'register' ? '' : 'd-none' }}" data-customer-panel="register">
+                            @csrf
+                            <input type="hidden" name="customer_mode" value="register">
+                            <div class="form-group">
+                                <label for="register-name">Nom complet</label>
+                                <input id="register-name" name="name" type="text" class="form-control"
+                                    value="{{ old('name') }}" autocomplete="name" maxlength="255" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="register-email">Adresse e-mail</label>
+                                <input id="register-email" name="email" type="email" class="form-control"
+                                    value="{{ old('email') }}" autocomplete="email" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="register-password">Mot de passe (8 caractères minimum)</label>
+                                <input id="register-password" name="password" type="password" class="form-control"
+                                    autocomplete="new-password" minlength="8" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="register-password-confirmation">Confirmer le mot de passe</label>
+                                <input id="register-password-confirmation" name="password_confirmation" type="password"
+                                    class="form-control" autocomplete="new-password" minlength="8" required>
+                            </div>
+                            <button type="submit" class="btn btn-dark">Créer mon compte</button>
+                        </form>
+                    @endauth
+
+                    <h2 class="step-title">Coordonnées de livraison</h2>
+                    <form action="{{ route('checkout.store') }}" method="POST" id="checkout-form"
+                        class="{{ !auth()->check() && $customerMode !== 'guest' ? 'd-none' : '' }}"
+                        data-checkout-details>
                         @csrf
+                        <input type="hidden" name="customer_mode" value="{{ $customerMode }}">
                         <div class="form-group">
                             <label for="fullname">Nom complet <abbr class="required" title="obligatoire">*</abbr></label>
                             <input id="fullname" name="fullname" type="text" class="form-control"
-                                value="{{ old('fullname') }}" autocomplete="name" required maxlength="255">
+                                value="{{ old('fullname', auth()->user()?->name) }}" autocomplete="name" required maxlength="255">
                         </div>
 
                         <div class="form-group">
                             <label for="email">Adresse e-mail <abbr class="required" title="obligatoire">*</abbr></label>
                             <input id="email" name="email" type="email" class="form-control"
-                                value="{{ old('email') }}" autocomplete="email" required maxlength="255">
+                                value="{{ old('email', auth()->user()?->email) }}" autocomplete="email" required maxlength="255">
                         </div>
 
                         <div class="form-group">
@@ -99,6 +199,21 @@
                                         <h3 class="product-title">
                                             {{ $item->product->title }} × {{ $item->quantity }}
                                         </h3>
+                                        @php
+                                            $selectedOptions = collect([
+                                                $item->variant?->name,
+                                                $item->productOption?->name,
+                                                $item->variantOption?->name,
+                                            ])->filter();
+                                        @endphp
+                                        @if ($selectedOptions->isNotEmpty())
+                                            <small class="text-muted">{{ $selectedOptions->implode(' / ') }}</small>
+                                        @endif
+                                        @if ($item->deliveryType)
+                                            <small class="d-block text-muted">
+                                                Réception : {{ $item->deliveryType->label }}
+                                            </small>
+                                        @endif
                                     </td>
                                     <td class="price-col text-right">
                                         {{ number_format((float) $item->price * $item->quantity, 2, ',', ' ') }} $
@@ -131,6 +246,10 @@
         const paymentPhoneGroup = document.querySelector('[data-payment-phone-group]');
         const paymentPhone = document.querySelector('[data-payment-phone]');
         const paymentMethods = document.querySelectorAll('input[name="payment_method"]');
+        const customerModes = document.querySelectorAll('input[name="customer_mode"]');
+        const customerPanels = document.querySelectorAll('[data-customer-panel]');
+        const checkoutDetails = document.querySelector('[data-checkout-details]');
+        const checkoutCustomerMode = checkoutDetails?.querySelector('[name="customer_mode"]');
 
         const updatePaymentPhone = () => {
             const isMobilePayment = document.querySelector('input[name="payment_method"]:checked')?.value === 'mobile';
@@ -140,6 +259,18 @@
 
         paymentMethods.forEach((method) => method.addEventListener('change', updatePaymentPhone));
         updatePaymentPhone();
+
+        const updateCustomerMode = () => {
+            const mode = document.querySelector('input[name="customer_mode"]:checked')?.value || 'guest';
+            customerPanels.forEach((panel) => {
+                panel.classList.toggle('d-none', panel.dataset.customerPanel !== mode);
+            });
+            if (checkoutDetails) checkoutDetails.classList.toggle('d-none', mode !== 'guest');
+            if (checkoutCustomerMode) checkoutCustomerMode.value = mode;
+        };
+
+        customerModes.forEach((mode) => mode.addEventListener('change', updateCustomerMode));
+        updateCustomerMode();
     })();
 </script>
 @endsection

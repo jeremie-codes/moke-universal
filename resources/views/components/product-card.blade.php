@@ -9,6 +9,7 @@
     $discount = $product->old_price && $product->old_price > $product->price
         ? round((($product->old_price - $product->price) / $product->old_price) * 100)
         : 0;
+    $availableStock = $product->availableStock();
     $typeLabels = ['book' => 'Livre', 'comic' => 'Bande dessinée', 'clothing' => 'Vêtement'];
 @endphp
 
@@ -26,7 +27,7 @@
             @if ($discount > 0)
                 <div class="product-label label-sale">-{{ $discount }}%</div>
             @endif
-            @if ($product->stock < 1)
+            @if ($availableStock < 1)
                 <div class="product-label label-hot">Épuisé</div>
             @endif
         </div>
@@ -44,14 +45,22 @@
         </div>
         <!-- End .price-box -->
         <div class="product-action">
-            <button type="button" class="btn-icon btn-add-cart js-add-to-cart"
-                data-url="{{ route('cart.items.store') }}" data-product-id="{{ $product->id }}"
-                data-product-name="{{ $product->title }}" data-product-image="{{ $imageUrl }}"
-                data-product-url="{{ route('shop.show', $product->slug) }}"
-                @disabled($product->stock < 1)>
-                <i class="fa fa-arrow-right"></i>
-                <span>AJOUTER AU PANIER</span>
-            </button>
+            @if ($product->options->isNotEmpty() || $product->variants->isNotEmpty() || $product->deliveryTypes->isNotEmpty())
+                <a class="btn-icon btn-add-cart" href="{{ route('shop.show', $product->slug) }}"
+                    @if ($availableStock < 1) aria-disabled="true" @endif>
+                    <i class="fa fa-arrow-right"></i>
+                    <span>{{ $availableStock > 0 ? 'CHOISIR LES OPTIONS' : 'ÉPUISÉ' }}</span>
+                </a>
+            @else
+                <button type="button" class="btn-icon btn-add-cart js-add-to-cart"
+                    data-url="{{ route('cart.items.store') }}" data-product-id="{{ $product->id }}"
+                    data-product-name="{{ $product->title }}" data-product-image="{{ $imageUrl }}"
+                    data-product-url="{{ route('shop.show', $product->slug) }}"
+                    data-product-base-stock="{{ $availableStock }}" @disabled($availableStock < 1)>
+                    <i class="fa fa-arrow-right"></i>
+                    <span>AJOUTER AU PANIER</span>
+                </button>
+            @endif
         </div>
     </div>
 </div>

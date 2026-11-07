@@ -3,7 +3,9 @@
 namespace App\Filament\Resources\Products\Schemas;
 
 use App\Models\Category;
+use Filament\Forms\Components\CheckboxList;
 use Filament\Forms\Components\DatePicker;
+use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
@@ -57,10 +59,11 @@ class ProductForm
                             ->multiple()
                             ->reorderable()
                             ->image()
-                            ->maxSize(5120), 
+                            ->maxSize(5120),
                     ]),
 
                 Section::make('Tarification')
+                    ->description('Le stock est géré par option. Le prix du produit s’applique à toutes ses variantes et options.')
                     ->schema([
                         TextInput::make('old_price')
                             ->label('Ancien Prix')
@@ -81,6 +84,14 @@ class ProductForm
                             ->numeric(),*/
                     ])
                     ->columns(3),
+
+                Section::make('Modes de réception')
+                    ->schema([
+                        CheckboxList::make('deliveryTypes')
+                            ->label('Modes autorisés pour ce produit')
+                            ->relationship(titleAttribute: 'label')
+                            ->columns(3),
+                    ]),
 
                 Section::make('Livre')
                     ->schema([
@@ -103,6 +114,55 @@ class ProductForm
 
                     ])
                     ->columns(2),
+
+                Section::make('Variantes et options')
+                    ->description('Ajoutez des options directement au produit ou des variantes (par exemple les couleurs) avec leurs propres options (par exemple les tailles).')
+                    ->schema([
+                        Repeater::make('options')
+                            ->relationship()
+                            ->label('Options du produit')
+                            ->schema([
+                                TextInput::make('name')
+                                    ->label('Nom (ex. S, M, L, EN, FR, PR)')
+                                    ->required(),
+                                TextInput::make('stock')
+                                    ->label('Stock')
+                                    ->numeric()
+                                    ->integer()
+                                    ->minValue(0)
+                                    ->default(0)
+                                    ->required(),
+                            ])
+                            ->columns(2)
+                            ->addActionLabel('Ajouter une option'),
+                        Repeater::make('variants')
+                            ->relationship()
+                            ->label('Variantes (ex. couleurs)')
+                            ->schema([
+                                TextInput::make('name')
+                                    ->label('Nom (ex. Rouge, Bleu)')
+                                    ->required(),
+                                Repeater::make('options')
+                                    ->relationship()
+                                    ->label('Options de cette variante (ex. tailles)')
+                                    ->schema([
+                                        TextInput::make('name')
+                                            ->label('Nom (ex. S, M, L)')
+                                            ->required(),
+                                        TextInput::make('stock')
+                                            ->label('Stock')
+                                            ->numeric()
+                                            ->integer()
+                                            ->minValue(0)
+                                            ->default(0)
+                                            ->required(),
+                                    ])
+                                    ->columns(2)
+                                    ->addActionLabel('Ajouter une option'),
+                            ])
+                            ->addActionLabel('Ajouter une variante'),
+                    ]),
+
 
             ]);
     }
