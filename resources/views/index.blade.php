@@ -167,16 +167,15 @@
 
         <div class="banners-container mb-2">
             <div class="banners-slider owl-carousel owl-theme" data-owl-options="{'dots': false }">
-                <div class="banner banner1 banner-sm-vw d-flex align-items-center appear-animate"
+                <div class="banner banner1 banner-sm-vw d-flex align-items-center appear-animate border"
                     style="background-color: #ccc;" data-animation-name="fadeInLeftShorter" data-animation-delay="500">
                     <figure class="w-100">
-                        <img src="{{ asset('assets/images/demoes/demo4/banners/banner-1.jpg') }}" alt="banner"
+                        <img src="{{ asset('assets/images/demoes/demo4/banners/book.png') }}" alt="banner"
                             width="380" height="175" />
                     </figure>
                     <div class="banner-layer">
-                        <h3 class="m-b-2">Bande dessinnée</h3>
-                        <h4 class="m-b-3 text-primary"><sup class="text-dark"><del>10%</del></sup>15%<sup>de
-                                réduction</sup></h4>
+                        <h3 class="m-b-2">Livres &</h3>
+                        <h5 class="m-b-2 text-secondary text-uppercase">Bande dessinnée</h5>
                         <a href="#section-livres" class="btn btn-sm btn-dark">Voir Plus</a>
                     </div>
                 </div>
@@ -203,10 +202,10 @@
                 </div>
                 <!-- End .banner -->
 
-                <div class="banner banner3 banner-sm-vw d-flex align-items-center appear-animate"
+                <div class="banner banner3 banner-sm-vw d-flex align-items-center appear-animate border"
                     style="background-color: #ccc;" data-animation-name="fadeInRightShorter" data-animation-delay="500">
                     <figure class="w-100">
-                        <img src="{{ asset('assets/images/demoes/demo4/banners/banner-3.jpg') }}" alt="banner"
+                        <img src="{{ asset('assets/images/demoes/demo4/banners/vetment.png') }}" alt="banner"
                             width="380" height="175" />
                     </figure>
                     <div class="banner-layer text-right">
