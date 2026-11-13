@@ -118,7 +118,7 @@
                 </div>
 
                 <div class="slider-product-image">
-                    <img src="{{ $sliderImage }}" alt="{{ $sliderProduct?->title ?? 'Image de la bannière' }}">
+                    <img src="{{ $sliderImage }}" alt="{{ $sliderProduct?->title ?? 'Image de la bannière' }}" style="box-shadow: #8f8d8dd6 0px 0px 15px 0px;">
                 </div>
 
                 <!-- End .banner-layer -->
