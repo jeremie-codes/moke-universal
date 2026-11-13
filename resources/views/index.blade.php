@@ -184,17 +184,12 @@
                 <div class="banner banner2 banner-sm-vw text-uppercase d-flex align-items-center appear-animate"
                     data-animation-name="fadeInUpShorter" data-animation-delay="200">
                     <figure class="w-100">
-                        <img src="{{ asset('assets/images/demoes/demo4/banners/banner-2.jpg') }}"
+                        <img src="{{ asset('assets/images/demoes/demo4/banners/promo.png') }}"
                             style="background-color: #ccc;" alt="banner" width="380" height="175" />
                     </figure>
                     <div class="banner-layer text-center">
-                        <div class="row align-items-lg-center">
-                            <div class="col-lg-7 text-lg-right">
-                                <h3>Offre promos</h3>
-                                <h4 class="pb-4 pb-lg-0 mb-0 text-body">A partir de deux articles</h4>
-                            </div>
-                            <br>
-                            <div class="col-lg-5 text-lg-left px-0 px-xl-3">
+                        <div class="row align-items-lg-center justify-content-center">
+                            <div class="text-center">
                                 <a href="#section-vetements" class="btn btn-sm btn-dark">Voir plus</a>
                             </div>
                         </div>
@@ -236,7 +231,7 @@
     </section>
 
     <section class="promo-section bg-dark" data-parallax="{'speed': 2, 'enableOnMobile': true}"
-        data-image-src="{{ asset('assets/images/demoes/demo4/banners/banner-5.jpg') }}">
+        data-image-src="{{ asset('assets/images/demoes/demo4/banners/ban.png') }}">
         <div class="promo-banner banner container text-uppercase">
             <div class="banner-content row align-items-center text-center">
                 <div class="col-md-4 ml-xl-auto text-md-right appear-animate" data-animation-name="fadeInRightShorter"
@@ -250,11 +245,11 @@
                 <div class="col-md-4 mr-xl-auto text-md-left appear-animate" data-animation-name="fadeInLeftShorter"
                     data-animation-delay="600">
                     <h4 class="mb-1 mt-1 font1 coupon-sale-text p-0 d-block ls-n-10 text-transform-none">
-                        <b>OFFRE PROMOS</b>
+                        <b>ACHETER A BON PRIX</b>
                     </h4>
                     <h5 class="mb-1 coupon-sale-text text-white ls-10 p-0">
-                        <i class="ls-0 mr-3">A PARTIR</i>
-                        <b class="text-white bg-secondary ls-n-10">$100</b>
+                        <i class="ls-0 mr-3">50% Off</i>
+                        <b class="text-white bg-secondary ls-n-10">NOS ARTICLES</b>
                     </h5>
                 </div>
             </div>
