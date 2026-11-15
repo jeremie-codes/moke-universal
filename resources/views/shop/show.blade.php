@@ -150,13 +150,13 @@
                                 @endif
 
                                 @if ($hasVariantOptions)
-                                    <fieldset class="form-group product-choice-group" data-variant-option-group hidden>
+                                    <fieldset class="form-group product-choice-group" data-variant-option-group>
                                         <legend>Option de la variante</legend>
                                         <div class="product-choice-list">
                                             @foreach ($product->variants as $variant)
                                                 @foreach ($variant->options as $option)
                                                     <label class="product-choice" for="variant-option-{{ $option->id }}"
-                                                        data-variant-id="{{ $variant->id }}" hidden>
+                                                        data-variant-id="{{ $variant->id }}">
                                                         <input id="variant-option-{{ $option->id }}" type="radio"
                                                             name="variant_option_id" value="{{ $option->id }}"
                                                             data-variant-id="{{ $variant->id }}"
