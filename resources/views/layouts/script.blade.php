@@ -24,7 +24,7 @@
              a.height = 1;
              a.width = 1;
              a.style.position = 'absolute';
-             a.style.top = 0;
+             a.style.top = 0; 
              a.style.left = 0;
              a.style.border = 'none';
              a.style.visibility = 'hidden';

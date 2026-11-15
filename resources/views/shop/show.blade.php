@@ -27,7 +27,7 @@
         box-shadow: 0 0 0 1px #222;
     }
 
-    .product-choice input:disabled + span {
+    .product-choice input:disabled+span {
         color: #888;
         text-decoration: line-through;
     }
@@ -47,19 +47,19 @@
 
 @section('body')
 @php
-    $productImages = $product->getMedia('images');
-    $imageUrls = $productImages->map(fn ($image) => $image->getUrl())->all();
-    if (empty($imageUrls) && $product->cover_image) {
-        $imageUrls[] = \Illuminate\Support\Facades\Storage::disk('public')->url($product->cover_image);
-    }
-    if (empty($imageUrls)) {
-        $imageUrls[] = asset('assets/images/products/product-1.jpg');
-    }
-    $discount = $product->old_price && $product->old_price > $product->price
-        ? round((($product->old_price - $product->price) / $product->old_price) * 100)
-        : 0;
-    $availableStock = $product->availableStock();
-    $hasVariantOptions = $product->variants->contains(fn ($variant) => $variant->options->isNotEmpty());
+$productImages = $product->getMedia('images');
+$imageUrls = $productImages->map(fn ($image) => $image->getUrl())->all();
+if (empty($imageUrls) && $product->cover_image) {
+$imageUrls[] = \Illuminate\Support\Facades\Storage::disk('public')->url($product->cover_image);
+}
+if (empty($imageUrls)) {
+$imageUrls[] = asset('assets/images/products/product-1.jpg');
+}
+$discount = $product->old_price && $product->old_price > $product->price
+? round((($product->old_price - $product->price) / $product->old_price) * 100)
+: 0;
+$availableStock = $product->availableStock();
+$hasVariantOptions = $product->variants->contains(fn ($variant) => $variant->options->isNotEmpty());
 @endphp
 
 <main class="main">
@@ -78,11 +78,11 @@
                     <div class="product-slider-container">
                         <div class="product-single-carousel owl-carousel owl-theme show-nav-hover">
                             @foreach ($imageUrls as $imageUrl)
-                                <div class="product-item">
-                                    <img class="product-single-image" src="{{ $imageUrl }}"
-                                        data-zoom-image="{{ $imageUrl }}" width="468" height="468"
-                                        alt="{{ $product->title }}" />
-                                </div>
+                            <div class="product-item">
+                                <img class="product-single-image" src="{{ $imageUrl }}"
+                                    data-zoom-image="{{ $imageUrl }}" width="468" height="468"
+                                    alt="{{ $product->title }}" />
+                            </div>
                             @endforeach
                         </div>
                         <span class="prod-full-screen"><i class="icon-plus"></i></span>
@@ -90,9 +90,9 @@
 
                     <div class="prod-thumbnail owl-dots">
                         @foreach ($imageUrls as $imageUrl)
-                            <div class="owl-dot">
-                                <img src="{{ $imageUrl }}" width="110" height="110" alt="{{ $product->title }}" />
-                            </div>
+                        <div class="owl-dot">
+                            <img src="{{ $imageUrl }}" width="110" height="110" alt="{{ $product->title }}" />
+                        </div>
                         @endforeach
                     </div>
                 </div>
@@ -105,7 +105,7 @@
 
                     <div class="price-box">
                         @if ($discount > 0)
-                            <del class="old-price">{{ number_format((float) $product->old_price, 2, ',', ' ') }} $</del>
+                        <del class="old-price">{{ number_format((float) $product->old_price, 2, ',', ' ') }} $</del>
                         @endif
                         <span class="new-price">{{ number_format((float) $product->price, 2, ',', ' ') }} $</span>
                     </div>
@@ -116,86 +116,84 @@
 
                     <div class="product-action">
                         @if ($availableStock > 0)
-                            <form class="product-options-form mb-2" data-product-options>
-                                @if ($product->options->isNotEmpty())
-                                    <fieldset class="form-group product-choice-group">
-                                        <legend>Option</legend>
-                                        <div class="product-choice-list">
-                                            @foreach ($product->options as $option)
-                                                <label class="product-choice" for="product-option-{{ $option->id }}">
-                                                    <input id="product-option-{{ $option->id }}" type="radio"
-                                                        name="product_option_id" value="{{ $option->id }}"
-                                                        data-stock="{{ $option->stock }}" required
-                                                        @disabled($option->stock < 1)>
-                                                    <span>{{ $option->name }}{{ $option->stock < 1 ? ' (Épuisé)' : '' }}</span>
-                                                </label>
-                                            @endforeach
-                                        </div>
-                                    </fieldset>
-                                @endif
+                        <form class="product-options-form mb-2" data-product-options>
+                            @if ($product->options->isNotEmpty())
+                            <fieldset class="form-group product-choice-group">
+                                <legend>Option</legend>
+                                <div class="product-choice-list">
+                                    @foreach ($product->options as $option)
+                                    <label class="product-choice" for="product-option-{{ $option->id }}">
+                                        <input id="product-option-{{ $option->id }}" type="radio"
+                                            name="product_option_id" value="{{ $option->id }}"
+                                            data-stock="{{ $option->stock }}" required @disabled($option->stock < 1)>
+                                            <span>{{ $option->name }}{{ $option->stock < 1 ? ' (Épuisé)' : '' }}</span>
+                                    </label>
+                                    @endforeach
+                                </div>
+                            </fieldset>
+                            @endif
 
-                                @if ($product->variants->isNotEmpty())
-                                    <fieldset class="form-group product-choice-group">
-                                        <legend>Variante</legend>
-                                        <div class="product-choice-list">
-                                            @foreach ($product->variants as $variant)
-                                                <label class="product-choice" for="product-variant-{{ $variant->id }}">
-                                                    <input id="product-variant-{{ $variant->id }}" type="radio"
-                                                        name="variant_id" value="{{ $variant->id }}" required>
-                                                    <span>{{ $variant->name }}</span>
-                                                </label>
-                                            @endforeach
-                                        </div>
-                                    </fieldset>
-                                @endif
+                            @if ($product->variants->isNotEmpty())
+                            <fieldset class="form-group product-choice-group">
+                                <legend>Variante</legend>
+                                <div class="product-choice-list">
+                                    @foreach ($product->variants as $variant)
+                                    <label class="product-choice" for="product-variant-{{ $variant->id }}">
+                                        <input id="product-variant-{{ $variant->id }}" type="radio" name="variant_id"
+                                            value="{{ $variant->id }}" required @checked($loop->first)>
+                                        <span>{{ $variant->name }}</span>
+                                    </label>
+                                    @endforeach
+                                </div>
+                            </fieldset>
+                            @endif
 
-                                @if ($hasVariantOptions)
-                                    <fieldset class="form-group product-choice-group" data-variant-option-group>
-                                        <legend>Option de la variante</legend>
-                                        <div class="product-choice-list">
-                                            @foreach ($product->variants as $variant)
-                                                @foreach ($variant->options as $option)
-                                                    <label class="product-choice" for="variant-option-{{ $option->id }}"
-                                                        data-variant-id="{{ $variant->id }}">
-                                                        <input id="variant-option-{{ $option->id }}" type="radio"
-                                                            name="variant_option_id" value="{{ $option->id }}"
-                                                            data-variant-id="{{ $variant->id }}"
-                                                            data-stock="{{ $option->stock }}"
-                                                            @disabled($option->stock < 1)>
-                                                        <span>{{ $option->name }}{{ $option->stock < 1 ? ' (Épuisé)' : '' }}</span>
-                                                    </label>
-                                                @endforeach
-                                            @endforeach
-                                        </div>
-                                    </fieldset>
-                                @endif
+                            @if ($hasVariantOptions)
+                            <fieldset class="form-group product-choice-group" data-variant-option-group hidden>
+                                <legend>Option de la variante</legend>
+                                <div class="product-choice-list">
+                                    @foreach ($product->variants as $variant)
+                                    @foreach ($variant->options as $option)
+                                    <label class="product-choice" for="variant-option-{{ $option->id }}"
+                                        data-variant-id="{{ $variant->id }}" hidden>
+                                        <input id="variant-option-{{ $option->id }}" type="radio"
+                                            name="variant_option_id" value="{{ $option->id }}"
+                                            data-variant-id="{{ $variant->id }}" data-stock="{{ $option->stock }}"
+                                            @disabled($option->stock < 1)>
+                                            <span>{{ $option->name }}{{ $option->stock < 1 ? ' (Épuisé)' : '' }}</span>
+                                    </label>
+                                    @endforeach
+                                    @endforeach
+                                </div>
+                            </fieldset>
+                            @endif
 
-                                @if ($product->deliveryTypes->isNotEmpty())
-                                    <div class="form-group">
-                                        <label for="delivery-type">Mode de réception</label>
-                                        <select id="delivery-type" class="form-control" name="delivery_type_id" required>
-                                            <option value="">Choisir un mode de réception</option>
-                                            @foreach ($product->deliveryTypes as $deliveryType)
-                                                <option value="{{ $deliveryType->id }}">{{ $deliveryType->label }}</option>
-                                            @endforeach
-                                        </select>
-                                    </div>
-                                @endif
-                            </form>
-
-                            <div class="product-single-qty">
-                                <input class="horizontal-quantity form-control js-product-quantity" type="number"
-                                    min="1" max="{{ $availableStock }}" value="1" aria-label="Quantité">
+                            @if ($product->deliveryTypes->isNotEmpty())
+                            <div class="form-group">
+                                <label for="delivery-type">Mode de réception</label>
+                                <select id="delivery-type" class="form-control" name="delivery_type_id" required>
+                                    <option value="">Choisir un mode de réception</option>
+                                    @foreach ($product->deliveryTypes as $deliveryType)
+                                    <option value="{{ $deliveryType->id }}">{{ $deliveryType->label }}</option>
+                                    @endforeach
+                                </select>
                             </div>
-                            <button type="button" class="btn btn-dark add-cart mr-2 js-add-to-cart"
-                                data-url="{{ route('cart.items.store') }}" data-product-id="{{ $product->id }}"
-                                data-product-name="{{ $product->title }}" data-product-image="{{ $imageUrls[0] }}"
-                                data-product-url="{{ route('shop.show', $product->slug) }}"
-                                data-product-base-stock="{{ $availableStock }}">
-                                <span>Ajouter au panier</span>
-                            </button>
+                            @endif
+                        </form>
+
+                        <div class="product-single-qty">
+                            <input class="horizontal-quantity form-control js-product-quantity" type="number" min="1"
+                                max="{{ $availableStock }}" value="1" aria-label="Quantité">
+                        </div>
+                        <button type="button" class="btn btn-dark add-cart mr-2 js-add-to-cart"
+                            data-url="{{ route('cart.items.store') }}" data-product-id="{{ $product->id }}"
+                            data-product-name="{{ $product->title }}" data-product-image="{{ $imageUrls[0] }}"
+                            data-product-url="{{ route('shop.show', $product->slug) }}"
+                            data-product-base-stock="{{ $availableStock }}">
+                            <span>Ajouter au panier</span>
+                        </button>
                         @else
-                            <button type="button" class="btn btn-dark" disabled>Épuisé</button>
+                        <button type="button" class="btn btn-dark" disabled>Épuisé</button>
                         @endif
                         <a href="{{ route('cart.index') }}" class="btn btn-gray">Voir le panier</a>
                     </div>
