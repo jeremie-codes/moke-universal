@@ -14,10 +14,10 @@ class PortfolioController extends Controller
     {
         $settings = Setting::first();
         $projects = Project::with(['media'])->where('is_published', true)->paginate(12);
-        $experiences = Experience::with(['media'])->where('is_active', true)->get();
+        $experiences = Experience::where('is_active', true)->get();
         $skills = Skill::where('is_active', true)->get();
         $teams = Partenaire::get();
-        
+
         return view('portfolio.index', compact('settings', 'projects', 'experiences', 'skills', 'teams'));
     }
 
